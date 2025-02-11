@@ -15,6 +15,7 @@ def delete_tables():
     try:
         conn.execute("Drop Table Train_Data")
         conn.execute("Drop Table Train_Stations")
+        conn.execute("Drop Table Train_Circuits")
     except:
         pass
     print("Tables dropped")
@@ -48,12 +49,25 @@ def create_db_tables():
     """)
     print("Locations Table Created")
     
+    #Circuits table
+    conn.execute(""" CREATE TABLE IF NOT EXISTS Train_Circuits (
+    SeqNum INT,
+    CircuitId INT,
+    StationCode VARCHAR,
+    Line TEXT,
+    TrackNum INT,
+    UNIQUE (SeqNum, CircuitId, Line, TrackNum)
+    
+);
+    """)
+    print("Circuits Table Created")
+    
 def update_train_stations_db(api_key):
     
     
     
     # Load the CSV file
-    file_path = r"Metro_Stations_Regional.csv"
+    file_path = "Metro_Stations_Regional.csv"
     # API URL
     url = "https://api.wmata.com/StationPrediction.svc/json/GetPrediction/All"
     
@@ -145,3 +159,36 @@ def update_train_location_db(api_key):
     # Insert DataFrame into DuckDB
     conn.execute("INSERT INTO train_data SELECT * FROM df")
     print("Locations updated in db")
+
+
+def update_train_circuits_db(api_key):
+    #Update circuit info
+    url = "https://api.wmata.com/TrainPositions/StandardRoutes?contentType=json"
+    # Query parameters
+    params = {
+        "contentType": "json"
+    }
+    
+    # Headers for the request
+    headers = {
+          "api_key": api_key
+    }
+    
+    response = requests.get(url, headers=headers, params=params)
+    response.raise_for_status()  # Raise an error for HTTP errors
+    location_data = response.json()  # Parse JSON response
+    location_data2 = location_data['StandardRoutes']
+     
+    #Turn List into table
+    circuit_list = []
+    for item in location_data2:
+        if "TrackCircuits" in item:
+            df = pd.DataFrame(item["TrackCircuits"])
+            df['Line'] = item['LineCode']
+            df['TrackNum'] = item['TrackNum']
+            circuit_list.append(df)
+    #concat df        
+    circuit_df = pd.concat(circuit_list, ignore_index=True)
+    
+    conn.execute("INSERT INTO Train_Circuits SELECT * FROM circuit_df")         
+
