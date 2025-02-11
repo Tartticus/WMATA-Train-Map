@@ -9,8 +9,8 @@ import os
 train_directory = os.getenv("TRAIN_PROJECT_DIR")
 os.chdir(train_directory)
 
-from trainlocations2 import get_train_locations
-from traindb import  update_train_stations_db, update_train_location_db, create_db_tables, delete_tables
+from trainpositions import get_train_locations
+from traindb import  update_train_stations_db, update_train_location_db, create_db_tables, delete_tables, update_train_circuits_db
 from trainmap import create_train_map
 
 # Replace with your WMATA API key
@@ -24,6 +24,7 @@ def main():
         delete_tables()
         create_db_tables()
         update_train_stations_db(api_key)
+        update_train_circuits_db(api_key)
         print("Station Data Updated")
     print("Updating Train DB")
     update_train_location_db(api_key)
