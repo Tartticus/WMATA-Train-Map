@@ -23,6 +23,8 @@ def main():
     if db_dec == "y":
         delete_tables()
         create_db_tables()
+        update_train_stations_db(api_key)
+        print("Station Data Updated")
     print("Updating Train DB")
     update_train_location_db(api_key)
     print("Getting Train Locations")
