@@ -48,10 +48,15 @@ def create_train_map(train_loc_df):
     
     # Plot train positions on the map with pink markers
     for _, row in train_loc_df.iterrows():
+        popup_data = f"""
+    <b>Station:</b> {row['Station_Name']}<br>
+    <b>Line:</b> {row['Line']}<br>
+    <b>Train Number:</b> {row['TrainNumber']}
+    """
         folium.Marker(
             location=[row["Latitude"], row["Longitude"]],
-            popup=f"Station: {row['Station_Name']}",
-            icon=folium.Icon(color="pink", icon="train", prefix="fa")  # Folium does not support 'pink', using 'lightred' as closest match
+            popup=folium.Popup(popup_data, max_width=300),
+            icon=folium.Icon(color="pink", icon="train", prefix="fa")  
         ).add_to(dc_map)
     
     # Save the map
