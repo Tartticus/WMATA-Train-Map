@@ -41,7 +41,7 @@ def create_train_map(train_loc_df):
         folium.Marker(
             location=[row["Latitude"], row["Longitude"]],
             popup=f"{row['NAME']} ({row['LINE']})",
-            icon=folium.Icon(color=color, icon="train", prefix="fa")
+            icon=folium.Icon(color=color, icon="building", prefix="fa")
         ).add_to(dc_map)
     
     
